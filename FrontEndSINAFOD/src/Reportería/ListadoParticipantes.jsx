@@ -414,7 +414,9 @@ const ListadoParticipantes = () => {
             <FormControl fullWidth>
               <Select onChange={(e) => setFilterColumn(e.target.value)}>
                 <MenuItem value="">Seleccionar columna</MenuItem>
-                <MenuItem value="formacion">Nombre de la Accion Formativa</MenuItem>
+                <MenuItem value="formacion">
+                  Nombre de la Accion Formativa
+                </MenuItem>
                 <MenuItem value="codigosace">Código SACE</MenuItem>
                 <MenuItem value="nombre">Nombre</MenuItem>
                 <MenuItem value="identificacion">Identidad</MenuItem>

@@ -292,7 +292,6 @@ const ListadoActividad = () => {
   };
 
   const columns = [
-  
     {
       field: "formacion",
       headerName: "Nombre de la Acción Formativa",
@@ -464,9 +463,9 @@ const ListadoActividad = () => {
             ) : filterColumn === "modalidad" ? (
               <FormControl fullWidth>
                 <Select onChange={(e) => setFilterValue(e.target.value)}>
-                  <MenuItem value="Online">Online</MenuItem>
+                  <MenuItem value="Virtual">Virtual</MenuItem>
                   <MenuItem value="Presencial">Presencial</MenuItem>
-                  <MenuItem value="Híbrido">Híbrido</MenuItem>
+                  <MenuItem value="Bimodal">Bimodal</MenuItem>
                 </Select>
               </FormControl>
             ) : filterColumn === "tipoactividad" ? (
