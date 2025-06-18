@@ -356,17 +356,18 @@ const ModificarFormacion = () => {
       );
 
       // Mostrar mensaje de éxito
-      await Swal.fire(
-        "Actualización!",
-        "La formación ha sido actualizada",
-        "success"
-      );
 
-      console.log("Datos que envio", formData);
+      Swal.fire({
+        title: "Actualización",
+        text: "La acción formativa ha sido actualizada.",
+        icon: "success",
+        timer: 6000,
+      });
+    
 
       // Redirigir a Participantes con el ID
       // navigate("/Participantes", { state: { investCap: id } });
-      navigate("/dashboard");
+      navigate("/Listado_De_Acciones_Formativas");
     } catch (error) {
       console.error("Error al guardar los datos", error);
       Swal.fire("Error!", "Error al guardar datos", "error");

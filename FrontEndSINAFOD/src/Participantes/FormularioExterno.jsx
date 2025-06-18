@@ -147,67 +147,47 @@ const FormularioExterno = () => {
 
 
 
-  const handleChange = (event) => {
-    const { name, value, type, checked } = event.target;
-    const newValue = type === "checkbox" ? checked : value;
+    const handleChange = (event) => {
+      const { name, value, type, checked } = event.target;
 
-    setFormData((prevData) => {
-      let updatedData = { ...prevData };
-      // Validación para años de servicio (solo números positivos)
-      if (name === "añosdeservicio") {
-  
-  
-  
-        if (!/^\d*$/.test(value)) {
-          return prevData; // Si no es un número positivo, no actualiza el estado
-        }
-      }
+      // 1) Manejar checkboxes (Material-UI usa `checked` en lugar de `value`)
+      let sanitizedValue =
+        type === "checkbox" ? checked : value === null ? "" : value;
 
-      // Si es el campo de fecha, validamos el formato
-      if (name === "fechanacimiento") {
-        // Si el usuario borra el campo, lo limpiamos
-        if (!value) {
-          updatedData.fechanacimiento = "";
-          updatedData.edad = "";
-          return updatedData;
+      setFormData((prevData) => {
+        // Base de la nueva data
+        let newData = { ...prevData, [name]: sanitizedValue };
+
+        if (name === "añosdeservicio") {
+          if (!/^\d*$/.test(value)) {
+            return prevData;
+          }
         }
 
-        // Convertimos a Date para validar
-        const dateObj = new Date(value);
+        // Si es fecha de nacimiento, calcular edad
+        if (name === "fechanacimiento" && value) {
+          const birthDate = new Date(value);
+          if (!isNaN(birthDate.getTime())) {
+            const today = new Date();
+            let age = today.getFullYear() - birthDate.getFullYear();
+            const monthDiff = today.getMonth() - birthDate.getMonth();
 
-        // Si la fecha es inválida, no actualizamos
-        if (isNaN(dateObj.getTime())) {
-          return prevData;
+            if (
+              monthDiff < 0 ||
+              (monthDiff === 0 && today.getDate() < birthDate.getDate())
+            ) {
+              age--;
+            }
+
+            newData.edad = age.toString();
+          } else {
+            // Si la fecha no es válida, limpiamos la edad
+            newData.edad = "";
+          }
         }
-
-        // Formateamos a YYYY-MM-DD (formato que acepta el input date)
-        const year = dateObj.getFullYear();
-        const month = String(dateObj.getMonth() + 1).padStart(2, "0");
-        const day = String(dateObj.getDate()).padStart(2, "0");
-        const formattedDate = `${year}-${month}-${day}`;
-
-        updatedData.fechanacimiento = formattedDate;
-
-        // Calculamos la edad
-        const today = new Date();
-        let age = today.getFullYear() - year;
-        const monthDiff = today.getMonth() - dateObj.getMonth();
-
-        if (
-          monthDiff < 0 ||
-          (monthDiff === 0 && today.getDate() < dateObj.getDate())
-        ) {
-          age--;
-        }
-
-        updatedData.edad = age.toString();
-      } else {
-        updatedData[name] = newValue;
-      }
-
-      return updatedData;
-    });
-  };
+        return newData;
+      });
+    };
 
   // Obtener departamentos del centro educativo
   useEffect(() => {
@@ -1176,7 +1156,7 @@ const FormularioExterno = () => {
                 </FormControl>
               </Grid>
               <Grid size={{ xs: 12, md: 12 }}>
-                <Typography variant="subtitle1">Caserio</Typography>
+                <Typography variant="subtitle1">Caserío</Typography>
                 <TextField
                   fullWidth
                   name="caserio"

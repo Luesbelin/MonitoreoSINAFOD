@@ -198,7 +198,7 @@ const ListadoParticipantes = () => {
         "Departamento en el que Reside",
         "Municipio en el que Reside",
         "Aldea en la que Reside",
-        "Caserio",
+        "Caserío",
 
         "Centro Educativo",
         "Código SACE del Centro Educativo",
@@ -335,7 +335,7 @@ const ListadoParticipantes = () => {
     },
     {
       field: "caserio",
-      headerName: "Caserio",
+      headerName: "Caserío",
       width: 180,
     },
 
