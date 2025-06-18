@@ -389,7 +389,10 @@ const ModificarFormacion = () => {
     <>
       <Dashboard>
         <Paper sx={{ padding: 3, marginBottom: 3 }}>
-          <Typography variant="h4" sx={{ color: color.primary.azul }}>
+          <Typography
+            variant="h4"
+            sx={{ color: color.primary.azul, fontWeight: "bold" }}
+          >
             Actualizar de Datos sobre la Acción Formativa
           </Typography>
           <Grid
@@ -897,6 +900,7 @@ const ModificarFormacion = () => {
                 >
                   <MenuItem value="Rural">Rural</MenuItem>
                   <MenuItem value="Urbana">Urbana</MenuItem>
+                  <MenuItem value="Ambas">Ambas</MenuItem>
                 </Select>
                 {fieldErrors.zona && (
                   <FormHelperText>Este campo es obligatorio</FormHelperText>
@@ -905,7 +909,7 @@ const ModificarFormacion = () => {
             </Grid>
             <Grid size={{ xs: 12, md: 6 }}>
               <Typography variant="subtitle1">
-                ¿Se realizó convocatoria?
+                ¿Se realizó Convocatoria?
               </Typography>
               <FormControl fullWidth error={fieldErrors.socializaron}>
                 <Select

@@ -17,8 +17,15 @@ import {
   Tabs,
   FormHelperText,
   Checkbox,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  Tooltip,
+  IconButton,
 } from "@mui/material";
 import { TabContext, TabPanel } from "@mui/lab";
+
+import { PDFViewer } from "@react-pdf/renderer";
 import { color } from "../../Components/color";
 import SaveIcon from "@mui/icons-material/Save";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -28,6 +35,121 @@ import { useUser } from "../../Components/UserContext";
 import Swal from "sweetalert2";
 
 import { QRCodeCanvas } from "qrcode.react";
+import { PDFDownloadLink } from "@react-pdf/renderer";
+import {
+  Page,
+  Text,
+  View,
+  Document,
+  Image,
+  StyleSheet,
+} from "@react-pdf/renderer";
+
+// Componente para el PDF
+import logoDGDP from "../../Components/img/Logo DGDP_FondoB.png";
+import logoSE from "../../Components/img/LogoEducacion.png";
+import marcaH from "../../Components/img/5 estrellas y H.png";
+
+// Estilos para el PDF
+
+const styles = StyleSheet.create({
+  page: {
+    position: "relative",
+    padding: 30,
+    fontFamily: "Helvetica",
+  },
+  backgroundColumn: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    width: 40,
+    height: "100%",
+    backgroundColor: color.primary.azul,
+  },
+  logoContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 30,
+    paddingHorizontal: 20,
+  },
+  logo: {
+    width: 120,
+    height: "auto",
+  },
+  marcaH: {
+    position: "absolute",
+    padding: 5,
+    bottom: 100,
+    left: 35,
+    width: 80,
+    height: 40,
+    backgroundColor: color.primary.azul,
+  },
+  content: {
+    marginTop: 20,
+    paddingHorizontal: 60,
+  },
+  title: {
+    fontSize: 18,
+    marginBottom: 20,
+    textAlign: "center",
+    fontWeight: "bold",
+  },
+  section: {
+    marginBottom: 10,
+  },
+  label: {
+    fontSize: 12,
+    fontWeight: "bold",
+    marginBottom: 5,
+  },
+  value: {
+    fontSize: 12,
+    marginBottom: 15,
+  },
+  qrContainer: {
+    marginTop: 20,
+    alignItems: "center",
+  },
+  qrImage: {
+    width: 150,
+    height: 150,
+  },
+  url: {
+    fontSize: 10,
+    marginTop: 10,
+    color: "#666",
+  },
+});
+
+const FormationPDF = ({ qrUrl }) => (
+  <Document>
+    <Page size="LETTER" style={styles.page}>
+      <View style={styles.backgroundColumn} />
+
+      <View style={styles.logoContainer}>
+        <Image style={styles.logo} src={logoDGDP} />
+        <Image style={styles.logo} src={logoSE} />
+      </View>
+
+      <View style={styles.content}>
+        <Text style={styles.title}>Formulario de Pre Inscripción</Text>
+
+        <View style={styles.qrContainer}>
+          <Text style={styles.label}>Código QR</Text>
+          <Image
+            style={styles.qrImage}
+            src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(
+              qrUrl
+            )}`}
+          />
+          <Text style={styles.url}>{qrUrl}</Text>
+        </View>
+      </View>
+      <Image style={styles.marcaH} src={marcaH} />
+    </Page>
+  </Document>
+);
 
 const Formacion = () => {
   const { user } = useUser();
@@ -38,6 +160,13 @@ const Formacion = () => {
   const [errorM, setErrorM] = useState("");
   const [error, setError] = useState("");
   const [isFromLineamientos, setIsFromLineamientos] = useState(false);
+
+  const [openModal, setOpenModal] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
+
+  const handleCloseModal = () => {
+    setOpenModal(false);
+  };
   const [formData, setFormData] = useState({
     formacion: location.state?.formacion || "",
 
@@ -328,8 +457,7 @@ const Formacion = () => {
         const updateResponse = await axios.put(
           `${process.env.REACT_APP_API_URL}/formacion/${idToUse}`,
           cleanedFormData,
-          { headers: { "Content-Type": "application/json" } },
-          navigate("/dashboard")
+          { headers: { "Content-Type": "application/json" } }
         );
       }
 
@@ -340,11 +468,7 @@ const Formacion = () => {
         "success"
       );
       setIsSaved(true);
-      console.log("Datos que envio", formData);
-
-      // Redirigir a Participantes con el ID  navigate(`/Participantes/${idToUse}`, { state: { investCap: idToUse, formacioninvest: formData.formacioninvest } });
-      const qrLink = `${process.env.REACT_APP_DOMINIO}/Formulario-De-Participante/${idToUse}`;
-      setQrUrl(qrLink); // <- guarda la URL en estado para mostrar QR
+      navigate("/Listado_De_Acciones_Formativas");
     } catch (error) {
       console.error("Error al guardar los datos", error);
       Swal.fire("Error!", "Error al guardar datos", "error");
@@ -912,6 +1036,7 @@ const Formacion = () => {
                 >
                   <MenuItem value="Rural">Rural</MenuItem>
                   <MenuItem value="Urbana">Urbana</MenuItem>
+                  <MenuItem value="Ambas">Ambas</MenuItem>
                 </Select>
                 {fieldErrors.zona && (
                   <FormHelperText>Este campo es obligatorio</FormHelperText>
@@ -921,7 +1046,7 @@ const Formacion = () => {
 
             <Grid size={{ xs: 12, md: 6 }}>
               <Typography variant="subtitle1">
-                ¿Se realizó convocatoria?
+                ¿Se realizó Convocatoria?
               </Typography>
               <FormControl fullWidth error={fieldErrors.socializaron}>
                 <Select
@@ -952,14 +1077,6 @@ const Formacion = () => {
           <Box
             sx={{ marginTop: 5, display: "flex", justifyContent: "flex-end" }}
           >
-            {qrUrl && (
-              <div style={{ marginTop: "20px" }}>
-                <h3>Escanea este QR:</h3>
-                <QRCodeCanvas value={qrUrl} size={200} />
-                <p>{qrUrl}</p>
-              </div>
-            )}
-
             <Button
               variant="contained"
               sx={{ backgroundColor: color.primary.azul, ml: 5 }}

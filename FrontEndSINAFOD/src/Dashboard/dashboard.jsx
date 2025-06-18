@@ -15,7 +15,7 @@ import React from "react";
 import { PDFViewer } from "@react-pdf/renderer";
 import { useUser } from "../Components/UserContext";
 import QrCodeScannerOutlinedIcon from "@mui/icons-material/QrCodeScannerOutlined";
-import QRCode from "qrcode";
+
 import { QRCodeCanvas } from "qrcode.react";
 import CambiarContraModal from "../Login/CambiarContraModal";
 import { color } from "../Components/color";
@@ -204,9 +204,8 @@ const Dashboard = ({ children }) => {
           borderRadius: 5,
           backgroundColor: "#f2f2f2",
         }}
-      >
-        {children}
-        <Tooltip title="Generar QR para participantes">
+      > 
+      <Tooltip title="Generar QR para participantes">
           <IconButton
             sx={{ color: color.primary.azul }}
             onClick={() => handleOpenQrModal()}
@@ -214,6 +213,8 @@ const Dashboard = ({ children }) => {
             <QrCodeScannerOutlinedIcon />
           </IconButton>
         </Tooltip>
+        {children}
+       
 
         <Typography
           variant="body2"
